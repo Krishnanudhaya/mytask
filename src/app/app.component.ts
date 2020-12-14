@@ -71,8 +71,6 @@ export class AppComponent {
     }
   };
 
-constructor() {
-}
 
 components(fg: FormGroup) {
   if (fg.controls['gender'].value == 'F' && fg.controls['age'].value != '--') {
@@ -100,6 +98,131 @@ set rapidPageValue (v) {
     console.log('error occored while you were typing the JSON');
   };
 }
+
+
+
+name = 'Angular';
+fields = [
+  {
+    type: "input",
+    label: "Username",
+    inputType: "text",
+    name: "name",
+    validations: [
+      {
+        name: "required",
+        validator: "required",
+        message: "Name Required"
+      },
+      {
+        name: "pattern",
+        validator: "^[a-zA-Z]+$",
+        message: "Accept only text"
+      }
+    ]
+  }, {
+    type: "password",
+    label: "Password",
+    inputType: "text",
+    name: "name",
+    validations: [
+      {
+        name: "required",
+        validator: "required",
+        message: "Password Required"
+      }
+    ]
+  }
+];
+dynamicForm: FormGroup;
+  dynamicFormm: FormGroup;
+constructor() {
+  const controls = {};    const controlss = {};
+  this.fields.forEach(res => {
+    const validationsArray = [];
+    res.validations.forEach(val => {
+      if (val.name === 'required') {
+        validationsArray.push(
+          Validators.required
+        );
+      }
+      if (val.name === 'pattern') {
+        validationsArray.push(
+          Validators.pattern(val.validator)
+        );
+      }
+    });
+    controls[res.label] = new FormControl('', validationsArray);
+  });
+  this.dynamicForm = new FormGroup(
+    controls
+  );
+
+
+  this.temp.fields.forEach(res => {
+    const validationsArray = [];
+
+      if (res.validation.isMandatory) {
+        validationsArray.push(
+          Validators.required
+        );
+      }
+      // if (res.name === 'pattern') {
+      //   validationsArray.push(
+      //     Validators.pattern(res.validator)
+      //   );
+      // }
+  
+    controlss[res.name] = new FormControl('', validationsArray);
+  });
+console.log("controlss ++ ",controlss)
+  this.dynamicFormm = new FormGroup(
+    controlss
+  );
+
+
+}
+
+onSubmit() {
+  console.log(this.dynamicForm.value);
+}
+
+
+temp ={
+  "name": "Contact Us",
+  fields: [ {
+    "name": "Name",
+    "id": "name",
+    "type": "text",
+    "validation": {
+      isMandatory: true,
+      stringType: "alpha" // (other values - alphaNumeric, all)
+    }
+  },
+  {
+    "name": "Age",
+    "id": "age",
+    "type": "number",
+    "validation": {
+      isMandatory: false,
+      minInclusive: 10,
+      maxInclusive: 20,
+    }
+  },
+  {
+    "name": "City",
+    "id": "city",
+    "type": "text",
+    "values": ["Chennai", "Bangalore", "Coimbatore"],
+    "validation": {
+      isMandatory: true,
+      isMultiSelection: false
+    }
+  }
+  ]
+};
+
+
 
 
   

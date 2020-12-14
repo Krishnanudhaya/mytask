@@ -1,2 +1,35 @@
 <json-form [formJson]="json" [debug]="false" (output)="components($event)"></json-form>
 <textarea [value]="rapidPageValue" (keyup)="update($event)" style="background-color:black;color:white;" name="Text1" cols="400" rows="50"></textarea> 
+
+
+<form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()" novalidate>
+    <ng-container *ngFor="let controls of fields">
+      {{controls.label}}
+      <input [type]="controls.type" [formControlName]="controls.label" />
+      <ng-container *ngFor="let validation of controls.validations">
+        <span *ngIf="dynamicForm.controls[controls.label].touched && dynamicForm.controls[controls.label].errors">
+          <p *ngIf="dynamicForm.controls[controls.label].errors[validation.name]">
+            {{validation.message}}
+          </p>
+        </span>
+      </ng-container>
+      <br>
+    </ng-container>
+    <br>
+    <input type="submit" [disabled]="!dynamicForm.valid" />
+  </form>
+  
+  <form [formGroup]="dynamicFormm" (ngSubmit)="onSubmit()" novalidate>
+    <div *ngFor="let element of temp.fields">
+      {{element.name}} :
+      <input [type]="element.type" name="element.name" id="element.id" />
+      <ng-container >
+        <span *ngIf="dynamicFormm.controls[element.name].touched && dynamicFormm.controls[element.label].errors">
+          <p *ngIf="dynamicFormm.controls[element.name].errors[element.name]">
+           not valid
+          </p>
+        </span>
+      </ng-container>
+      <br>
+    </div>
+  </form>
