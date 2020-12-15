@@ -72,158 +72,209 @@ export class AppComponent {
   };
 
 
-components(fg: FormGroup) {
-  if (fg.controls['gender'].value == 'F' && fg.controls['age'].value != '--') {
-    fg.controls['age'].setValue('--');
-    fg.controls['age'].disable();
-  } else if (fg.controls['gender'].value == 'M' && !fg.controls['age'].enabled) {
-    fg.controls['age'].enable();
-    fg.controls['age'].setValue('');
+  components(fg: FormGroup) {
+    if (fg.controls['gender'].value == 'F' && fg.controls['age'].value != '--') {
+      fg.controls['age'].setValue('--');
+      fg.controls['age'].disable();
+    } else if (fg.controls['gender'].value == 'M' && !fg.controls['age'].enabled) {
+      fg.controls['age'].enable();
+      fg.controls['age'].setValue('');
+    }
   }
-}
 
-update($event) {
-  // debugger;
-  this.json = JSON.parse($event.target.value);
-}
-
-get rapidPageValue () {
-  return JSON.stringify(this.json, null, 2);
-}
-
-set rapidPageValue (v) {
-  try{
-  this.json = JSON.parse(v);}
-  catch(e) {
-    console.log('error occored while you were typing the JSON');
-  };
-}
-
-
-
-name = 'Angular';
-fields = [
-  {
-    type: "input",
-    label: "Username",
-    inputType: "text",
-    name: "name",
-    validations: [
-      {
-        name: "required",
-        validator: "required",
-        message: "Name Required"
-      },
-      {
-        name: "pattern",
-        validator: "^[a-zA-Z]+$",
-        message: "Accept only text"
-      }
-    ]
-  }, {
-    type: "password",
-    label: "Password",
-    inputType: "text",
-    name: "name",
-    validations: [
-      {
-        name: "required",
-        validator: "required",
-        message: "Password Required"
-      }
-    ]
+  update($event) {
+    // debugger;
+    this.json = JSON.parse($event.target.value);
   }
-];
-dynamicForm: FormGroup;
+
+  get rapidPageValue() {
+    return JSON.stringify(this.json, null, 2);
+  }
+
+  set rapidPageValue(v) {
+    try {
+      this.json = JSON.parse(v);
+    }
+    catch (e) {
+      console.log('error occored while you were typing the JSON');
+    };
+  }
+
+
+
+  name = 'Angular';
+  fields = [
+    {
+      type: "input",
+      label: "Username",
+      inputType: "text",
+      name: "name",
+      validations: [
+        {
+          name: "required",
+          validator: "required",
+          message: "Name Required"
+        },
+        {
+          name: "pattern",
+          validator: "^[a-zA-Z]+$",
+          message: "Accept only text"
+        }
+      ]
+    }, {
+      type: "password",
+      label: "Password",
+      inputType: "text",
+      name: "name",
+      validations: [
+        {
+          name: "required",
+          validator: "required",
+          message: "Password Required"
+        }
+      ]
+    }
+  ];
+
+
+  dynamicForm: FormGroup;
   dynamicFormm: FormGroup;
-constructor() {
-  const controls = {};    const controlss = {};
-  this.fields.forEach(res => {
-    const validationsArray = [];
-    res.validations.forEach(val => {
-      if (val.name === 'required') {
-        validationsArray.push(
-          Validators.required
-        );
-      }
-      if (val.name === 'pattern') {
-        validationsArray.push(
-          Validators.pattern(val.validator)
-        );
-      }
+  constructor() {
+    const controls = {}; const controlss = {};
+    this.fields.forEach(res => {
+      const validationsArray = [];
+      res.validations.forEach(val => {
+        if (val.name === 'required') {
+          validationsArray.push(
+            Validators.required
+          );
+        }
+        if (val.name === 'pattern') {
+          validationsArray.push(
+            Validators.pattern(val.validator)
+          );
+        }
+      });
+      controls[res.label] = new FormControl('', validationsArray);
     });
-    controls[res.label] = new FormControl('', validationsArray);
-  });
-  this.dynamicForm = new FormGroup(
-    controls
-  );
+    this.dynamicForm = new FormGroup(
+      controls
+    );
+    console.log("temp.fields", this.temp.fields);
 
-
-  this.temp.fields.forEach(res => {
-    const validationsArray = [];
+    this.temp.fields.forEach(res => {
+      const tempFiledsValidationsArray = [];
 
       if (res.validation.isMandatory) {
-        validationsArray.push(
+        console.log("valid result", res.validation.isMandatory)
+        tempFiledsValidationsArray.push(
           Validators.required
         );
       }
+      switch (res.validation.stringType) {
+        case "alpha":
+          tempFiledsValidationsArray.push(
+            Validators.pattern("^[A-Za-z]+$")//only alphabets
+          );
+          break;
+        case "alphanumeric":
+          tempFiledsValidationsArray.push(
+            Validators.pattern("([A-z0-9a-z\s]){2,}")// alphanumeric
+          );
+          break;
+        case "all":
+          tempFiledsValidationsArray.push(
+            Validators.pattern(".{2,}")//all
+          );
+          break;
+
+
+        default:
+          tempFiledsValidationsArray.push(
+            Validators.pattern(".{2,}")//all
+          );
+          break;
+      }
+
+      if (res.validation.minInclusive && res.validation.maxInclusive) {
+        tempFiledsValidationsArray.push(
+          Validators.min(res.validation.minInclusive),
+          Validators.max(res.validation.maxInclusive)
+        );
+        console.log("res.validation.minInclusive", tempFiledsValidationsArray);
+      }
+
       // if (res.name === 'pattern') {
       //   validationsArray.push(
       //     Validators.pattern(res.validator)
       //   );
       // }
-  
-    controlss[res.name] = new FormControl('', validationsArray);
-  });
-console.log("controlss ++ ",controlss)
-  this.dynamicFormm = new FormGroup(
-    controlss
-  );
+
+      controlss[res.label] = new FormControl('', tempFiledsValidationsArray);
+    });
+    console.log("controlss ++ ", controlss)
+    this.dynamicFormm = new FormGroup(
+      controlss
+    );
 
 
-}
-
-onSubmit() {
-  console.log(this.dynamicForm.value);
-}
-
-
-temp ={
-  "name": "Contact Us",
-  fields: [ {
-    "name": "Name",
-    "id": "name",
-    "type": "text",
-    "validation": {
-      isMandatory: true,
-      stringType: "alpha" // (other values - alphaNumeric, all)
-    }
-  },
-  {
-    "name": "Age",
-    "id": "age",
-    "type": "number",
-    "validation": {
-      isMandatory: false,
-      minInclusive: 10,
-      maxInclusive: 20,
-    }
-  },
-  {
-    "name": "City",
-    "id": "city",
-    "type": "text",
-    "values": ["Chennai", "Bangalore", "Coimbatore"],
-    "validation": {
-      isMandatory: true,
-      isMultiSelection: false
-    }
   }
-  ]
-};
+
+  onSubmit() {
+    console.log("newForm value", this.dynamicFormm.value);
+  }
+
+
+  temp = {
+    "name": "Contact Us",
+    fields: [{
+      label: "Name",
+      name: "Name",
+      id: "name",
+      type: "text",
+      validation: {
+        isMandatory: true,
+        stringType: "alpha" // (other values - alphaNumeric, all)
+      }
+    },
+    {
+      label: "Age",
+      name: "Age",
+      id: "age",
+      type: "number",
+      validation: {
+        // pattern:"[1-9]*",
+        isMandatory: false,
+        minInclusive: 10,
+        maxInclusive: 20,
+      }
+    },
+    {
+      label: "City",
+      name: "City",
+      id: "city",
+      selectBox: true,
+      type: "select",
+      values: ["Chennai", "Bangalore", "Coimbatore"],
+      validation: {
+        isMandatory: true,
+        isMultiSelection: false
+      }
+    },
+    {
+      label: "Email",
+      name: "Email",
+      id: "email",
+      type: "email",
+      validation: {
+        isMandatory: true,
+      }
+    }
+    ]
+
+  };
 
 
 
 
-  
 }

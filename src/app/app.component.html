@@ -20,16 +20,28 @@
   </form>
   
   <form [formGroup]="dynamicFormm" (ngSubmit)="onSubmit()" novalidate>
-    <div *ngFor="let element of temp.fields">
-      {{element.name}} :
-      <input [type]="element.type" name="element.name" id="element.id" />
-      <ng-container >
-        <span *ngIf="dynamicFormm.controls[element.name].touched && dynamicFormm.controls[element.label].errors">
-          <p *ngIf="dynamicFormm.controls[element.name].errors[element.name]">
+    <div class="row col-md-12" *ngFor="let element of temp.fields">
+      <div class="col-md-1">  {{element.label}} :</div>
+    <div class="col-md-4">
+      <input [type]="element.type" *ngIf="!element.selectBox" [formControlName]="element.label" />
+      <select [formControlName]="element.label" *ngIf="element.selectBox && !element.validation.isMultiSelection">
+        <option value="undefined" selected disabled>--Select City--</option>
+        <option [value]="opt" *ngFor="let opt of element.values">{{opt}}</option>
+      </select>
+      <select multiple [formControlName]="element.label" *ngIf="element.selectBox && element.validation.isMultiSelection">
+        <option value="undefined" selected disabled>--Select City--</option>
+        <option [value]="opt" *ngFor="let opt of element.values">{{opt}}</option>
+      </select>
+    </div>
+      <ng-container *ngFor="let validation of element.validations">
+        <span *ngIf="dynamicFormm.controls[element.label].touched && dynamicFormm.controls[element.label].errors">
+          <p *ngIf="dynamicFormm.controls[element.label].errors[element.name]">
            not valid
           </p>
         </span>
       </ng-container>
       <br>
     </div>
+    <button type="submit" class="btn btn-success" [disabled]="!dynamicFormm.valid">Submit</button>
+
   </form>
